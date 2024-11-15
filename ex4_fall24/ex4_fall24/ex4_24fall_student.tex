@@ -1,0 +1,164 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage[margin=.75in]{geometry}
+\usepackage{booktabs}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage[normalem]{ulem}
+
+\newif\ifsolution
+
+
+\newif\ifrubric
+\rubricfalse
+% Remove comment for next line to show rubric
+% \rubrictrue
+
+\ifsolution
+
+\newcommand{\solnewpage}{\newpage}
+\else
+
+\newcommand{\solnewpage}{}
+\fi
+\ifrubric
+\newcommand{\rubric}[1]{\textbf{Rubric:} #1}
+\else
+\newcommand{\rubric}[1]{}
+\fi
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\prob}[1]{\PP \left( #1 \right)}
+\newcommand{\condprob}[2]{\PP \left( #1 \middle| #2 \right)}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\expect}[2]{\EE_{#1} \left[ #2 \right]}
+\newcommand{\condexp}[3]{\EE_{#1} \left[ #2 \middle| #3 \right]}
+
+\begin{document}
+\begin{center}
+	\begin{tabular}{|c|}
+		\hline
+		4180/5180: Reinforcement Learning and Sequential Decision Making (Fall 2024) \hspace{1cm} Christopher Amato \\
+		Northeastern University \hfill  Due Oct 11, 2024                                                    \\\\
+		{\bfseries \large Exercise 4: Monte-Carlo Methods}                                    \\ \hline
+	\end{tabular}
+\end{center}
+
+
+Please remember the following policies:
+\begin{itemize}
+	\item Exercise due at \textbf{11:59 PM EST Oct 11, 2024}.
+	\item Submissions should be made electronically on Canvas. Please ensure that your solutions for both the written and programming parts are present. You can upload multiple files in a single submission, or you can zip them into a single file. You can make as many submissions as you wish, but only the latest one will be considered.
+
+	\item For \uline{\textbf{Written}} questions, solutions may be handwritten or typeset. If you write your answers by hand and submit images/scans of them, please please ensure legibility and order them correctly in a single PDF file.
+	\item The PDF file should also include the figures from the \uline{\textbf{Plot}} questions.
+	\item For both \uline{\textbf{Plot}} and \uline{\textbf{Code}} questions, submit your source code in Jupyter Notebook (.ipynb file) along with reasonable comments of your implementation. Please make sure the code runs correctly. 
+	\item You are welcome to discuss these problems with other students in the class, but you must understand and write up the solution and code yourself. Also, you \textit{must} list the names of all those (if any) with whom you discussed your answers at the top of your PDF solutions page.
+	\item Each exercise may be handed in up to two days late (24-hour period), penalized by 10\% per day late. Submissions later than two days will not be accepted.
+	\item Contact the teaching staff if there are medical or other extenuating circumstances that we should be aware of.
+	\item \textbf{Notations: RL2e is short for the reinforcement learning book 2nd edition. x.x means the Exercise x.x in the book.}
+\end{itemize}
+
+\begin{enumerate}
+
+	\item \textbf{2 point.} (RL2e 5.2, 5.5, 5.8) \textit{First-visit vs. every-visit.} \\
+	      \uline{\textbf{Written:}}
+	      \begin{enumerate}
+		      \item Read the Example 5.1 in RL2e. Suppose every-visit MC was used instead of first-visit MC on the blackjack task. Would you expect the results to be very different? Why or why not?
+
+		      \item Consider an MDP with a single nonterminal state and a single action that transitions back to the nonterminal state with probability $p$ and transitions to the terminal state with probability $1-p$. Let the reward be $+1$ on all transitions, and let $\gamma = 1$. Suppose you observe one episode that lasts $10$ steps, with a return of $10$. What are the first-visit and every-visit estimators of the value of the nonterminal state?
+
+                \item \textbf{[Extra credit (1 point)]} Read and understand example 5.5 first.
+The results with Example 5.5 and shown in Figure 5.4 used a first-visit MC method. Suppose that instead an every-visit MC method was used on the same problem. Would the variance of the estimator still be infinite? Why or why not? \\
+            \uline{\textbf{Code/plot:}} Implement Example 5.5 and reproduce Figure 5.4 to verify your answer.
+
+\end{enumerate}
+
+\solnewpage
+
+	      % Blackjack
+	\item \textbf{2 points.} \textit{Blackjack.} \\
+	      \uline{\textbf{Code/plot:}}
+	      \begin{enumerate}
+		      \item Implement first-visit Monte-Carlo policy evaluation (prediction). \\
+		            Apply it to the Blackjack environment for the ``sticks only on 20 or 21'' policy to reproduce Figure 5.1.
+		      \item Implement first-visit Monte-Carlo control with exploring starts (Monte-Carlo ES). \\
+		            Apply it to the Blackjack environment to reproduce Figure 5.2. \\
+		            Note that the reset mechanism already selects all states initially with probability $> 0$, but you must ensure that all actions are also selected with probability $> 0$.
+	      \end{enumerate}
+	      \textit{Useful tools for implementation}:
+	      \begin{itemize}
+		      \item Instead of writing your own Blackjack environment, we recommend that you use the implementation provided by Gymnasium (maintained fork of OpenAI Gym), or at least refer to it closely if you are re-implementing your own version. \\
+		            This would also be a good opportunity to start setting up and learning about the library.
+		      \item For installation instructions and a brief introduction: \url{https://gymnasium.farama.org}
+		      \item Once you have installed Gymnasium, you can instantiate the environment by calling: \\
+		            \texttt{import gymnasium as gym} \\
+		            \texttt{env = gym.make("Blackjack-v1")}
+		      \item For more specifics on the interface and implementation of Blackjack, see: \\
+                        \url{https://gymnasium.farama.org/environments/toy_text/blackjack} \\
+		            \url{https://github.com/openai/gym/blob/master/gym/envs/toy_text/blackjack.py}
+		      \item To plot the value functions and policies, consider using: \texttt{matplotlib.pyplot.imshow}
+	      \end{itemize}
+
+	      % FourRooms, plot learning curve
+	\item \textbf{2 points.} \textit{Four Rooms, re-visited.} \\
+	      We are now finally ready to re-visit the Four Rooms domain from Ex0, now with better learning algorithms. We provide you with the implementation of the Four Rooms environment in the Jupyter Notebook and make the domain episodic to apply Monte-Carlo methods. The modifications are as follows:
+	      \begin{itemize}
+	          \item Instead of teleporting to $(0,0)$ after reaching the goal, we make the goal a terminal state (i.e., end of episode). In other words, the episode terminates after the agent reaches the goal state (i.e. $(10, 10)$).
+	          \item We add a timeout to the episodes, i.e., an episode terminates after some maximum number of steps even the agent doesn't reach the goal. In the current implementation, we set T = 459. 
+	      \end{itemize} 
+	      \begin{enumerate}
+		      
+		      \item \uline{\textbf{Code/plot:}} Implement on-policy first-visit Monte-Carlo control (for $\epsilon$-soft policies). Let us solve the FourRooms problem with a fixed goal state $= (10,10)$, which is initially unknown to the agent. \\
+		            To verify the agent is learning, plot learning curves similar to those in Ex1.
+		            \begin{itemize}
+			            \item The horizontal axis should be in episodes; the vertical axis should be each episode's discounted return.
+			            \item Plot curves for $\varepsilon = 0.1, 0.01, 0$. For clear trends, running for $10$ trials with $10^4$ episodes within each trial is recommended, but if it is too time-consuming you may run less. You can use the provided plotting function to plot the curves. You can test your implementation by running for $5$ trials with $10^3$ episodes within each trial for each $\epsilon$.
+		            \end{itemize}
+		      \item \uline{\textbf{Written:}} Explain how the results of the $\varepsilon = 0$ setting demonstrate the importance of doing exploring starts in Monte-Carlo ES.
+	      \end{enumerate}
+
+	\item \textbf{1 point.} (RL2e 5.10, 5.11) \textit{Off-policy methods.} \\
+	      \uline{\textbf{Written:}}
+	      \begin{enumerate}
+		      \item \textbf{[CS5180 only]} Derive the weighted-average update rule (Equation 5.8) from (Equation 5.7). Follow the pattern of the derivation of the unweighted rule (Equation 2.3).
+
+		      \item In the boxed algorithm for off-policy MC control, you may have been expecting the $W$ update to have involved the importance-sampling ratio $\frac{\pi(A_t | S_t)}{b(A_t | S_t)}$, but instead it involves $\frac{1}{b(A_t | S_t)}$. Why is this correct? % nevertheless correct?
+	      \end{enumerate}
+
+	      \solnewpage
+
+	\item \textbf{3 points.[5180]} (RL2e 5.12) \textit{Racetrack.} \\
+	      Consider driving a race car around a turn like those shown in Figure 5.5. You want to go as fast as possible, but not so fast as to run off the track. In our simplified racetrack, the car is at one of a discrete set of grid positions, the cells in the diagram. The velocity is also discrete, a number of grid cells moved horizontally and vertically per time step. The actions are increments to the velocity components. Each may be changed by $+1$, $-1$, or $0$ in each step, for a total of nine ($3 \times 3$) actions. Both velocity components are restricted to be nonnegative and less than $5$, and they cannot both be zero except at the starting line. Each episode begins in one of the randomly selected start states with both velocity components zero and ends when the car crosses the finish line. The rewards are $-1$ for each step until the car crosses the finish line. If the car hits the track boundary, it is moved back to a random position on the starting line, both velocity components are reduced to zero, and the episode continues. Before updating the car's location at each time step, check to see if the projected path of the car intersects the track boundary. If it intersects the finish line, the episode ends; if it intersects anywhere else, the car is considered to have hit the track boundary and is sent back to the starting line. To make the task more challenging, with probability $0.1$ at each time step the velocity increments are both zero, independently of the intended increments.
+	      \begin{enumerate}
+		      \item \uline{\textbf{Code:}} Use the provided implementation of the Racetrack. Apply on-policy first-visit Monte-Carlo control (for $\varepsilon$-soft policies) to the racetrack domain (both tracks), with $\varepsilon = 0.1$ -- ideally, this would be a simple application of the code from Q3(a).\\
+		            \uline{\textbf{Plot:}} For each racetrack, plot the learning curve (multiple trials with confidence bands), similar to Q3(a). Note that, trials number = 10, episode number per trials = $2000$. 
+		      \item \uline{\textbf{Code:}} Implement off-policy Monte-Carlo control and apply it to the racetrack domain (both tracks). For the behavior policy, use an $\varepsilon$-greedy action selection method, based on the latest estimate of $Q(s, a)$ -- i.e., this is similar to on-policy Monte-Carlo control, except that the target policy is kept as a greedy policy. \\
+		            \uline{\textbf{Plot:}} For each racetrack, plot the learning curve (multiple trials with confidence bands), similar to Q3(a). Plot the learning curve for the target policy, do this by collecting one rollout after each episode of training, which is collected solely for evaluation purposes. Visualize several rollouts of the optimal policy (i.e., the target policy); Consider using: \texttt{matplotlib.pyplot.imshow}
+		      \item \uline{\textbf{Written:}} Do you observe any significant differences between the on-policy and off-policy methods? \\
+		            Are there any interesting differences between the two racetracks?
+	      \end{enumerate}
+	      \textit{Tip}: You can find NumPy arrays containing the racetracks in \texttt{Jupyter Notebook}. \\
+	      Think about which racetrack you expect is easier, and develop your methods in that domain.
+	      
+	      \begin{figure} [h]
+		      \begin{center}
+			      \includegraphics[width=.7\linewidth]{racetrack.png}
+		      \end{center}
+	      \end{figure}
+
+\end{enumerate}
+
+\end{document}

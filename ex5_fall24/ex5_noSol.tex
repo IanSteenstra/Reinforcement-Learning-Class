@@ -1,0 +1,210 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage[margin=.75in]{geometry}
+\usepackage{booktabs}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+%\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage[normalem]{ulem}
+\usepackage{xcolor}
+
+\newif\ifsolution
+\solutionfalse
+% Remove comment for next line to show solutions
+% \solutiontrue
+\newif\ifrubric
+\rubricfalse
+% Remove comment for next line to show rubric
+%\rubrictrue
+
+\ifsolution
+\newcommand{\solution}[1]{\textbf{Suggested answer:} #1}
+\newcommand{\solnewpage}{\newpage}
+\else
+\newcommand{\solution}[1]{}
+\newcommand{\solnewpage}{}
+\fi
+\ifrubric
+\newcommand{\rubric}[1]{\textbf{Rubric:} #1}
+\else
+\newcommand{\rubric}[1]{}
+\fi
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\prob}[1]{\PP \left( #1 \right)}
+\newcommand{\condprob}[2]{\PP \left( #1 \middle| #2 \right)}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\expect}[2]{\EE_{#1} \left[ #2 \right]}
+\newcommand{\condexp}[3]{\EE_{#1} \left[ #2 \middle| #3 \right]}
+
+\begin{document}
+\begin{center}
+	\begin{tabular}{|c|}
+		\hline
+		4180/5180: Reinforcement Learning and Sequential Decision Making (Fall 2024) \hspace{1cm} Christopher Amato \\
+		Northeastern University \hfill  Due Oct 25, 2024                                                    \\\\
+		{\bfseries \large Exercise 5: Temporal-Difference Learning}                                    \\ \hline
+	\end{tabular}
+\end{center}
+
+
+Please remember the following policies:
+\begin{itemize}
+	\item Exercise due at \textbf{11:59 PM EST Oct 26, 2022}.
+	\item Submissions should be made electronically on Canvas. Please ensure that your solutions for both the written and programming parts are present. You can upload multiple files in a single submission, or you can zip them into a single file. You can make as many submissions as you wish, but only the latest one will be considered.
+	\item For \uline{\textbf{Written}} questions, solutions are \textbf{required} to be \textbf{typeset}. If you write your answers by hand and submit images/scans of them, there will be a small penalty.
+	\item The PDF file should also include the figures from the \uline{\textbf{Plot}} questions.
+	\item For both \uline{\textbf{Plot}} and \uline{\textbf{Code}} questions, submit your source code in Jupyter Notebook (.ipynb file) along with reasonable comments of your implementation. Please make sure the code runs correctly. 
+	\item You are welcome to discuss these problems with other students in the class, but you must understand and write up the solution and code yourself. Also, you \textit{must} list the names of all those (if any) with whom you discussed your answers at the top of your PDF solutions page.
+	\item Each exercise may be handed in up to two days late (24-hour period), penalized by 10\% per day late. Submissions later than two days will not be accepted.
+	\item Contact the teaching staff if there are medical or other extenuating circumstances that we should be aware of.
+	\item \textbf{Notations: RL2e is short for the reinforcement learning book 2nd edition. x.x means the Exercise x.x in the book.}
+\end{itemize}
+
+\textbf{Note: Please submit your assignment with the pdf and ipynb or zip file containing your last name and first name. Also include graphs in your type up. Not doing so will have a small penalty.}
+\begin{enumerate}
+	\item \textbf{1 point.} (RL2e 6.2) \textit{Temporal difference vs. Monte-Carlo.} \\
+	      \uline{\textbf{Written:}}
+	      Read and understand Example 6.1. Is there any situation (not necessarily related to this example) where the Monte-Carlo approach might be better than TD? Explain with an example, or explain why not.\
+
+	\item \textbf{1 point.} (RL2e 6.11, 6.12) \textit{Q-learning vs. SARSA.} \\
+	      \uline{\textbf{Written:}}
+	      \begin{enumerate}
+		      \item Why is Q-learning considered an off-policy control method?
+
+		      \item Suppose action selection is greedy. Is Q-learning then exactly the same algorithm as SARSA? Will they make exactly the same action selections and weight updates? Explain it briefly.
+
+	      \end{enumerate}
+
+	\item \textbf{2 points.} (RL2e 6.4, 6.5) \textit{Random-walk task.} \\
+	      \uline{\textbf{Written:}}
+	      Read and understand Example 6.2 and Example 7.1, then answer the following:
+	      \begin{enumerate}
+
+		      \item The specific results shown in the right graph of the random walk example are dependent on the value of the step-size parameter, $\alpha$. Do you think the conclusions about which algorithm is better would be affected if a wider range of $\alpha$ values were used? Is there a different, fixed value of $\alpha$ at which either algorithm would have performed significantly better than shown? Why or why not?
+
+		      \item In the right graph of the random walk example, the RMS error of the TD method seems to go down and then up again, particularly at high $\alpha$'s. What could have caused this? Do you think this always occurs, or might it be a function of how the approximate value function was initialized? Explain your answer briefly. 
+
+	      \end{enumerate}
+
+	      \solnewpage
+
+	\item \textbf{4 points.} (RL2e 6.9) \textit{Windy gridworld.} \\
+	    
+	      \uline{\textbf{Code/plot:}}
+	      In this question, you will implement several TD-learning methods and apply them to the windy gridworld in Example 6.5. The implementation of the environment is provided. 
+	      \begin{enumerate}
+		      \item Implement the following methods, to be applied to windy gridworld:
+		            \begin{itemize}
+			            \item SARSA (on-policy TD control)
+			            \item Expected SARSA
+			            \item Q-learning (off-policy TD control)
+		            \end{itemize}
+		            To compare each method, generate line plots similar to that shown in Example 6.5 (do not generate the inset figure of the gridworld). Make sure you understand the axes in the plot, which is not the same as before. \\
+		            As in previous exercises, perform at least $10$ trials, and show the average performance with confidence bands ($1.96 \times$ standard error). \\
+		            \textit{Note}: You may adjust hyperparameters for each method as necessary; for SARSA, use the values provided in the example ($\varepsilon = 0.1, \alpha = 0.5$) so that you can reproduce the plot in the textbook.
+
+	      \end{enumerate}
+	      For the following parts, apply at least two of the above TD methods to solve them.
+	      \begin{enumerate}[resume]
+		      \item \textit{Windy gridworld with King's moves}: Re-solve the windy gridworld assuming eight possible actions, including the diagonal moves, rather than four. How much better can you do with the extra actions? \\
+		            Can you do even better by including a ninth action that causes no movement at all other than that caused by the wind?
+
+	      \end{enumerate}
+
+	\item \textbf{2 points. [5180]} \textit{Bias-variance trade-off.} \\
+	      In lecture, we discussed that Monte-Carlo methods are unbiased but typically high-variance, whereas TD methods trade off bias to obtain lower-variant estimates. We will investigate this claim empirically in this question, from the perspective of prediction.
+
+	      The overall experimental setup is as follows.
+	      \begin{itemize}
+		      \item We will continue with the original windy grid-world domain.
+		      \item A fixed policy $\pi$ will be specified to collect episodes.
+		      \item A certain number of ``training'' episodes $N \in \{1, 10, 50\}$ will be collected.
+		      \item Each method being investigated (On-Policy TD($0$), On-Policy Monte-Carlo prediction) will learn to estimate the state-value function using the $N$ ``training`` episodes, respectively.
+		      \item We then evaluate the distribution of learning targets each method experiences at a specified state $S$. In this question, $S$ is the initial state marked as $S$ in the Example 6.5. \\
+		            To do so, you need to collect additional $100$ ``evaluation'' episodes. Instead of using these to perform further updates to the state-value function, we will instead evaluate the distribution of learning targets $V(S)$ based on the ``evaluation'' episodes. For example, TD($0$) will experience a set of $\{R + V(S')\}$ targets, whereas Monte-Carlo will experience a set of $\{G\}$ targets.
+	      \end{itemize}
+	      Note: Make sure that you use the same policy to gather episodes for On-Policy TD($0$) and On-Policy Monte-Carlo prediction.
+       \begin{figure}[h!]
+            \centering
+            \includegraphics[width=0.5\linewidth]{cs5180_chengguang_fall2022/ex5/q5-td-1.png}
+            \caption{Example of TD(0) with $n=1$ episodes.}
+            \label{fig:td0-n50}
+        \end{figure}
+
+	      \begin{enumerate}
+		      \item \uline{\textbf{Code/plot:}} Perform the above experiment for the specified methods and training episodes $N$. \\
+		            Use a near-optimal stochastic policy $\pi$ (e.g., found by SARSA or other methods in Q4). \\
+		            Perform the evaluation for the start state (indicated `S' in Example 6.5). \\
+		            Plot the histogram of learning targets experienced in the evaluation episodes for each combination of $N$ and method (i.e., $6$ histograms total). The horizontal axis is the target values and the vertical axis is the number of the target values. An example for n-step TD is shown below for guidance.\\
+		            Use dynamic programming or any other appropriate method to compute the true value of $v_\pi(s)$ for comparison purposes, and add this to your plots as well.\\
+
+
+		            \solution{
+			            \begin{figure}[h!]
+				            \begin{center}
+					            \includegraphics[width=.3\linewidth]{q5-mc-1.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-mc-10.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-mc-50.png}
+					            \\
+					            \includegraphics[width=.3\linewidth]{q5-ns-1.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-ns-10.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-ns-50.png}
+					            \\
+					            \includegraphics[width=.3\linewidth]{q5-td-1.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-td-10.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-td-50.png}
+				            \end{center}
+				            \caption{Q5(a): Histogram of returns. Rows: Monte-Carlo, $4$-step returns, TD($0$). Columns: $N = 1, 10, 50$.}
+			            \end{figure}
+
+			            \begin{figure}
+				            \begin{center}
+					            \includegraphics[width=.3\linewidth]{q5-mc-100.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-mc-300.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-mc-1000.png}
+					            \\
+					            \includegraphics[width=.3\linewidth]{q5-ns-100.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-ns-300.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-ns-1000.png}
+					            \\
+					            \includegraphics[width=.3\linewidth]{q5-td-100.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-td-300.png}
+					            \hfill
+					            \includegraphics[width=.3\linewidth]{q5-td-1000.png}
+				            \end{center}
+				            \caption{Q5(a): Histogram of returns. Rows: Monte-Carlo, $4$-step returns, TD($0$). Columns: $N = 100, 300, 1000$.}
+			            \end{figure}
+		            }
+		      \item \uline{\textbf{Written:}} Describe what you observe from your histograms. \\
+		            Comment on what they may show about the bias-variance trade-off between the different methods, and how it may depend on the amount of training that has already occurred.
+
+		      \item \textbf{[Extra credit. 0.5 points]} If we considered the scenario of control (i.e., we would use on-policy action-value methods, iteratively update the policy during training, and use it to generate the next training episode), would that change the results, and how? Please give a reasonable hypothesis.
+
+	      \end{enumerate}
+
+\end{enumerate}
+
+\end{document}

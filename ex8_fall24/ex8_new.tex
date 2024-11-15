@@ -1,0 +1,133 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage[margin=.75in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+%\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage[normalem]{ulem}
+
+\newif\ifsolution
+\solutionfalse
+% Remove comment for next line to show solutions
+% \solutiontrue
+\newif\ifrubric
+\rubricfalse
+% Remove comment for next line to show rubric
+%\rubrictrue
+
+\ifsolution
+\newcommand{\solution}[1]{\textbf{Suggested answer:} #1}
+\newcommand{\solnewpage}{\newpage}
+\else
+\newcommand{\solution}[1]{}
+\newcommand{\solnewpage}{}
+\fi
+\ifrubric
+\newcommand{\rubric}[1]{\textbf{Rubric:} #1}
+\else
+\newcommand{\rubric}[1]{}
+\fi
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\prob}[1]{\PP \left( #1 \right)}
+\newcommand{\condprob}[2]{\PP \left( #1 \middle| #2 \right)}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\expect}[2]{\EE_{#1} \left[ #2 \right]}
+\newcommand{\condexp}[3]{\EE_{#1} \left[ #2 \middle| #3 \right]}
+
+\begin{document}
+\begin{center}
+	\begin{tabular}{|c|}
+		\hline
+		CS7180: Special Topic - Artificial Intelligence (Fall 2024) \hspace{1cm} Christopher Amato \\
+		Northeastern University      \hfill   Due date seen on Canvas           \\\\
+		{\bfseries \large Exercise 8: Deep Q-Network (DQN)}                                    \\ \hline
+	\end{tabular}
+\end{center}
+
+
+Please remember:
+\begin{itemize}
+	\item Be mindful that this exercise may include question(s) requiring \textbf{significant compute time}, plan accordingly. 
+	\item For exercise due date please refer to Canvas.
+	\item Submissions should be made electronically on Canvas. Please ensure that your solutions for both the written and programming parts are present. You can upload multiple files in a single submission, or you can zip them into a single file. You can make as many submissions as you wish, but only the latest one will be considered.
+	      % \item Submissions should be made electronically via the submission link on Piazza. Please ensure that your solutions for both the written and programming parts are present, zipped into a single file. \\
+	      % \textbf{Please use the naming convention: \texttt{Ex3 - [FirstName] [LastName] [Part 1/2] [Version number].zip}}
+	\item For \uline{\textbf{Written}} questions, solutions should be typeset. If you write your answers by hand and submit images/scans of them, it will \textbf{not} be considered.
+	\item The PDF file should also include the figures from the \uline{\textbf{Plot}} questions.
+	\item For both \uline{\textbf{Plot}} and \uline{\textbf{Code}} questions, submit your source code along with reasonable documentation.
+	\item You are welcome to discuss these problems with other students in the class, but you must understand and write up the solution and code yourself. Also, you \textit{must} list the names of all those (if any) with whom you discussed your answers at the top of your PDF solutions page.
+	\item Each exercise may be handed in up to two days late (24-hour period), penalized by 10\% per day late. Submissions later than two days will not be accepted.
+	\item Contact the teaching staff if there are medical or other extenuating circumstances that we should be aware of.
+\end{itemize}
+
+\begin{enumerate}
+
+
+\item \textbf{3 points.} \textit{Nonlinear Function Approximation with Neural Networks}
+
+Universal approximation theorem tells us Neural Networks have a good deal of approximation capabilities.
+In this question, we will be approximating a low-dimensional non-linear function $f(x) = 1 + x^2$ using stochastic gradient descent. Please use PyTorch library (https://pytorch.org) for this homework.
+
+\begin{enumerate}
+\item \uline{\textbf{Code:}} Use linspace to get 500 even spaced values in the range of $[-10,10]$, complete your training set by obtaining the function outputs for each of the 500 inputs. 
+\item \uline{\textbf{Code:}} Build your two-hidden-layer model with $relu$ as activation, layers are of size 8. Setup the Adam (Adaptive Moment Estimation) optimizer.
+\item \uline{\textbf{Code:}} Randomly sample batches of size 32 from your training set, calculate your loss on the batch (mean squared error), and perform parameter update based on the gradient. Repeat until your loss is sufficiently low or stable. You will be setting your own learning rate. 
+\item \uline{\textbf{Plot:}} Plot your approximated function and the original function using a line plot. Additionally, test and plot your model with layers with widths 16, 64 and 128.
+\item \uline{\textbf{Written:}} How accurate is your learned model? How accurate it is within the range of $[-10,10]$? How about outside of the range? Can you notice any difference between models having different layer widths? What do you think that may have caused the difference?
+\end{enumerate}
+
+\item \textbf{4 points.} \textit{Four Rooms yet again but with DQN}
+
+In this question, you will implement DQN and test it on our favorite domain, Four Rooms, as implemented in ex4 and ex7.
+You will be in charge of your network architecture and other hyperparameters. However, you are recommended to start with a network with a single hidden layer of 64 units; replay size of 100000 transitions, $\epsilon=0.1$, batch size of 64, discounter factor at $0.99$. You may use the DQN starter code provided for question 3 to help you with this question.
+
+\begin{enumerate}
+	\item \uline{\textbf{Code:}} Setup your environment, replay memory buffer, value networks, and optimizers. Remember that although your value network models the $Q(s,a)$ value function $(s,a\rightarrow q(s,a))$, in the case of DQN it takes the state as input and output vector-form values for all actions $(s \rightarrow [q(s,a_1),q(s,a_2),...]^T)$.  
+	\item \uline{\textbf{Code:}} Collect rollouts and store them in reply memory while performing batch updates in Q-Learning fashion based on the data in your reply memory. Your loss is the batch MSE of your TD error (the difference between your targets and your value predictions). Also, remember to use $\epsilon$-greedy in your rollouts.
+	\item \uline{\textbf{Code:}} Update your target network periodically (e.g. every 10000 steps). Repeat the learning process until there is little or no performance gain.
+	\item \uline{\textbf{Plot, Written:}} Plot your learning curve (averaged over 10 trails) with confidence bands. How does it compare to your tabular methods from previous exercises?
+	% \item \uline{\textbf{Written:}} Render your runs in the middle of your training, what kind of policy (or policies) do you see and why? Explain your reasoning. 
+\end{enumerate}
+
+\item \textbf{3 points.} \textit{Evaluate and tune your DQN on more environments}
+
+In this question, you will evaluate your DQN on CartPole (\url{https://gymnasium.farama.org/environments/classic_control/cart_pole/}) and LunarLander (\url{https://gymnasium.farama.org/environments/box2d/lunar_lander/}). You will need to schedule your $\epsilon$ so that it is annealed to a low value (e.g., 0.05) from 1.
+
+\begin{enumerate}
+	\item \uline{\textbf{Code:}} Run and tune your DQN on CartPole and LunarLander.
+	\item \uline{\textbf{Plot}} Plot your learning curve (averaged over 5 trials) with confidence bands.
+	\item \uline{\textbf{Written}} What are the network architecture and hyperparameters you find works for CartPole and LunarLander respectively?
+	\item \textbf{[5180]} \uline{\textbf{Written:}} For each environment that you trained in, describe the progress of the training in terms of the behavior of the agent at each of the 5 phases of training (i.e. 0\%, 25\%, 50\%, 75\%, 100\%). Make sure you view each phase a few times so that you can see all sorts of variations.
+ 
+    Describe something for each phase. Start by describing the behavior at phase 0\%, then, for each next phase, describe how it differs from the previous one, how it improves and/or how it becomes worse. At the final phase (100\%), also describe the observed behavior in absolute terms, and whether it has achieved optimality.
+    
+    *Note: You may need to restart the kernel after rendering some episodes. Do not manually close the Pygame window. Even if you restart the kernel, you do not need to re-train on the environments; the relevant Q-network parameters should be stored in the corresponding PyTorch checkpoint .pt file.*
+\end{enumerate}
+
+
+\item \textbf{[Extra credit.]} \textbf{2 points.} \textit{DQN on Atari}
+
+
+\begin{enumerate}
+	\item \uline{\textbf{Code:}} Evaluate your DQN on any of the Atari game provided with gym (we recommend start with Pong). You will need to add convolution layer. Additionally, you may want to use libraries like OpenAI Baselines for image processing (grayscaling, framestacking, etc.). 
+	\item \uline{\textbf{Plot, Written}} Plot your learning curve (averaged over some number of trials that you decide). How long does your experiments take to complete? What did you have to do with the hyperparameters to make it work?
+\end{enumerate}
+
+
+
+\end{enumerate}
+
+\end{document}
